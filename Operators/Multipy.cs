@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+
+namespace calculator.Operators
+{
+    internal class Multipy : IOperation
+    {
+        public string Pattern => @"\d \* \d";
+
+        public double Operate(double[] values)
+        {
+            Debug.WriteLine($"values: {string.Join(", ", values)}");
+            return values[0] * values[1];
+        }
+    }
+}
