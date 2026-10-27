@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace calculator
 {
@@ -16,9 +17,9 @@ namespace calculator
             Debug.WriteLine($"calc: {calc}  text: {calc.Text}  numbers: {string.Join(", ", calc.Numbers)}");
             foreach (IOperation op in Operators)
             {
-                while (calc.TryOperator(op.Pattern, out double[] values))
+                while (calc.TryOperator(op.Pattern, out double[] values, out string expression))
                 {
-                    double result = op.Operate(values);
+                    double result = op.Operate(values, expression);
                     calc.ReplaceOperation(op.Pattern, result);
                     Debug.WriteLine($"pattern: {op.Pattern}  result: {result}  calc: {calc}");
                 }

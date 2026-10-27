@@ -5,11 +5,11 @@ using System.Text;
 
 namespace calculator.Operators
 {
-    internal class Add : IOperation
+    internal class Add : SingleOperation
     {
-        public string Pattern => @"\d \+ \d";
+        public override string Pattern => @"\d \+ \d";
 
-        public double Operate(double[] values)
+        public override double Operate(double[] values)
         {
             Debug.WriteLine($"values: {string.Join(", ", values)}");
             return values[0] + values[1];

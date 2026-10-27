@@ -24,9 +24,13 @@ namespace calculator
 
         private void calculation_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Calculator.Operators.Add(new Multipy());
-            Calculator.Operators.Add(new Add());
+            //MultipleOperation minus = new MultipleOperation(new Minus(), new CompactMinus());
+            Calculator.Operators.Add(new ValueStack());
+            Calculator.Operators.Add(new MultipleOperation(new Multipy(), new Divide()));
+            Calculator.Operators.Add(new MultipleOperation(new Minus(), new Add()));
             result.Text = Calculator.calculate(calculation.Text).ToString();
+
+            //result.Text = Helper.BracketMatch(calculation.Text);
         }
     }
 }

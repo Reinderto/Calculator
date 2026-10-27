@@ -12,6 +12,7 @@ namespace calculator
 
         public Calculation(string text)
         {
+            text = Regex.Replace(text, @"(?<=(\d|\)))-(?=\d)", "+-");
             const string numRegex = @"-?\d+([\.,]\d+)?";
             List<Match> matches = Regex.Matches(text, numRegex).ToList();
             Numbers = new List<double>(matches.Count);
@@ -31,14 +32,16 @@ namespace calculator
             }
         }
 
-        public bool TryOperator(string operatorPattern, out double[] values)
+        public bool TryOperator(string operatorPattern, out double[] values, out string expression)
         {
             Match match = MatchOperatorPattern(operatorPattern);
             if (!match.Success)
             {
                 values = new double[0];
+                expression = "";
                 return false;
             }
+            expression = match.Value;
             int[] indexes = OperationNumberIndexes(match);
             values = Array.ConvertAll(indexes, i => Numbers[i]);
             return true;
@@ -50,22 +53,32 @@ namespace calculator
             return Regex.Match(Text, operatorPattern);
         }
 
-        private int[] OperationNumberIndexes(Match operatorMatch)
+        private static int[] OperationNumberIndexes(Match operatorMatch)
         {
             if (!operatorMatch.Success)
             {
                 throw new ArgumentException("failed match argument");
             }
-            int indexesCount = operatorMatch.Groups.Count - 1;
+            List<int> indexes = new List<int>();
+            for (int i = 1; i <= operatorMatch.Groups.Count - 1; i++)
+            {
+                Group group = operatorMatch.Groups[i];
+                if (group.Success)
+                {
+                    indexes.Add(int.Parse(operatorMatch.Groups[i].Value));
+                }
+            }
+            return indexes.ToArray();
+            /*int indexesCount = operatorMatch.Groups.Count - 1;
             int[] indexes = new int[indexesCount];
             for(int i = 1; i <= indexesCount; i++)
             {
                 indexes[i - 1] = int.Parse(operatorMatch.Groups[i].Value);
             }
-            return indexes;
+            return indexes;*/
         }
 
-        private static string ReformatOperator(string operatorPattern)
+        public static string ReformatOperator(string operatorPattern)
         {
             return operatorPattern.Replace(@"\d", @"(\d+)").Replace(" ", " *");
         }
@@ -85,7 +98,16 @@ namespace calculator
                 firstIndex = Numbers.Count;
                 Numbers.Add(result);
             }
-            Text = Helper.ReplaceOnce(Text, match.Value, firstIndex.ToString());
+            string replacement = firstIndex.ToString();
+            if(Regex.IsMatch(Text, @"\d *" + match.Value))
+            {
+                replacement = "+" + replacement;
+            }
+            if (Regex.IsMatch(Text,  match.Value + @" *\d"))
+            {
+                replacement += "+";
+            }
+            Text = Helper.ReplaceOnce(Text, match.Value, replacement);
         }
 
         public override string ToString()

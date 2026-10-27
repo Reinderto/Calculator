@@ -8,6 +8,6 @@ namespace calculator.Operators
     {
         public string Pattern { get; }
 
-        public double Operate(double[] values);
+        public double Operate(double[] values, string expression);
     }
 }
