@@ -32,6 +32,10 @@ namespace calculator
             Calculator.Operators.Add(new Pow());
             Calculator.Operators.Add(new MultipleOperation(new Multipy(), new Divide(), new Modulo()));
             Calculator.Operators.Add(new MultipleOperation(new Minus(), new Add()));
+            Calculator.Operators.Add(new MultipleOperation(new LeftShift(), new RightShift(), new UnsignedRightShift()));
+            Calculator.Operators.Add(new BitwiseAnd());
+            Calculator.Operators.Add(new BitwiseXor());
+            Calculator.Operators.Add(new BitwiseOr());
         }
 
         private void calculation_TextChanged(object sender, TextChangedEventArgs e)
