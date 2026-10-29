@@ -8,12 +8,15 @@ namespace calculator
 {
     internal class Calculation
     {
+        public const string NUMBER_PLACEHOLDER_LEFT = "<$";
+        public const string NUMBER_PLACEHOLDER_RIGHT = "$>";
         public string Text { get; set; }
         public List<double> Numbers { get; set; }
 
         public Calculation(string text)
         {
-            text = Regex.Replace(text, @"(?<=(\d|\)))-(?=\d)", "+-");
+            text = Regex.Replace(text, @"(?<=(\d|\))) *- *(?=\d)", "+-");
+            text = Regex.Replace(text, @"(?<=\d) *\{", "*{");
             const string numRegex = @"-?\d+([\.,]\d+)?";
             List<Match> matches = Regex.Matches(text, numRegex).ToList();
             Numbers = new List<double>(matches.Count);
@@ -29,7 +32,7 @@ namespace calculator
             this.Text = textMatch.Groups[1].Value;
             for(int i = 2; i < textMatch.Groups.Count; i++)
             {
-                this.Text += i - 2 + textMatch.Groups[i].Value;
+                this.Text += NUMBER_PLACEHOLDER_LEFT + (i - 2) + NUMBER_PLACEHOLDER_RIGHT + textMatch.Groups[i].Value;
             }
         }
 
@@ -93,7 +96,8 @@ namespace calculator
             {
                 foreach (Capture cap in operatorMatch.Groups["Numbers"].Captures)
                 {
-                    indexes.Add(int.Parse(cap.Value));
+                    string strIndex = cap.Value.Substring(NUMBER_PLACEHOLDER_LEFT.Length, cap.Value.Length - NUMBER_PLACEHOLDER_RIGHT.Length - NUMBER_PLACEHOLDER_LEFT.Length);
+                    indexes.Add(int.Parse(strIndex));
                 }
             }
             else
@@ -119,7 +123,7 @@ namespace calculator
 
         public static string ReformatOperator(string operatorPattern)
         {
-            return operatorPattern.Replace(@"\d", @"(\d+)").Replace(" ", " *");
+            return operatorPattern.Replace(@"\d", Regex.Escape(NUMBER_PLACEHOLDER_LEFT) + @"(\d+)" + Regex.Escape(NUMBER_PLACEHOLDER_RIGHT)).Replace(" ", " *");
         }
 
         public void ReplaceOperation(string operatorPattern, double result)
@@ -137,14 +141,18 @@ namespace calculator
                 firstIndex = Numbers.Count;
                 Numbers.Add(result);
             }
-            string replacement = firstIndex.ToString();
-            if(Regex.IsMatch(Text, @"\d *" + match.Value))//num detection
+            string replacement = NUMBER_PLACEHOLDER_LEFT + firstIndex.ToString() + NUMBER_PLACEHOLDER_RIGHT;
+            if(Regex.IsMatch(Text, $@"\d{Regex.Escape(NUMBER_PLACEHOLDER_RIGHT)} *" + Regex.Escape(match.Value)))//num detection
             {
                 replacement = "+" + replacement;
             }
-            if (Regex.IsMatch(Text,  match.Value + @" *\d"))
+            if (Regex.IsMatch(Text, Regex.Escape(match.Value) + $@" *{Regex.Escape(NUMBER_PLACEHOLDER_LEFT)}\d"))
             {
                 replacement += "+";
+            }
+            if(Regex.IsMatch(Text, Regex.Escape(match.Value) + @" *\{"))
+            {
+                replacement += "*";
             }
             //if(Regex.IsMatch(Text, ))
             Text = Helper.ReplaceOnce(Text, match.Value, replacement);
@@ -155,7 +163,7 @@ namespace calculator
             string output = Text;
             for(int i = Numbers.Count - 1; i >= 0; i--)
             {
-                output = Helper.ReplaceOnce(output, i.ToString(), Numbers[i].ToString());
+                output = Helper.ReplaceOnce(output, NUMBER_PLACEHOLDER_LEFT + i.ToString() + NUMBER_PLACEHOLDER_RIGHT, Numbers[i].ToString());
             }
             return output;
         }
