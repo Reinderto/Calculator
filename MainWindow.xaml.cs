@@ -20,17 +20,23 @@ namespace calculator
         public MainWindow()
         {
             InitializeComponent();
+            SetupCalculator();
+        }
+
+        private void SetupCalculator()
+        {
+            //MultipleOperation minus = new MultipleOperation(new Minus(), new CompactMinus());
+            Calculator.Operators.Add(new Brackets());
+            Calculator.Operators.Add(new ValueStack());
+            Calculator.Operators.Add(new MultipleOperation(new Multipy(), new Divide()));
+            Calculator.Operators.Add(new MultipleOperation(new Minus(), new Add()));
         }
 
         private void calculation_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //MultipleOperation minus = new MultipleOperation(new Minus(), new CompactMinus());
-            Calculator.Operators.Add(new ValueStack());
-            Calculator.Operators.Add(new MultipleOperation(new Multipy(), new Divide()));
-            Calculator.Operators.Add(new MultipleOperation(new Minus(), new Add()));
-            result.Text = Calculator.calculate(calculation.Text).ToString();
+            result.Text = Calculator.Calculate(calculation.Text).ToString();
 
-            //result.Text = Helper.BracketMatch(calculation.Text);
+            //result.Text += "\n" + Helper.BracketMatch(calculation.Text);
         }
     }
 }

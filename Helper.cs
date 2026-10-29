@@ -20,5 +20,12 @@ namespace calculator
             Regex regexPattern = new Regex(pattern);
             return regexPattern.Replace(old, replacement, 1);
         }
+
+        public static string BracketMatch(string text)
+        {
+            //Match match = Regex.Match(text, @"\([^\(\)]*\)");
+            Match match = Regex.Match(text, @"(?<open>\{)(?(open)[^\{}\d]*(?<Numbers>(\d+))*(?<open>\{)*(?<close-open>})*)+(?(open)(?!))");
+            return match.Value;
+        }
     }
 }

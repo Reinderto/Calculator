@@ -11,20 +11,25 @@ namespace calculator
     {
         public static List<IOperation> Operators = new List<IOperation>();
 
-        public static string calculate(string calculation)
+        public static string Calculate(string calculation)
         {
-            Calculation calc = new Calculation(calculation);
-            Debug.WriteLine($"calc: {calc}  text: {calc.Text}  numbers: {string.Join(", ", calc.Numbers)}");
+            return Calculate(new Calculation(calculation));
+        }
+
+        public static string Calculate(Calculation calculation)
+        {
+            Debug.WriteLine("----------------------------------------------------------------------");
+            Debug.WriteLine($"calc: {calculation}  text: {calculation.Text}  numbers: {string.Join(", ", calculation.Numbers)}");
             foreach (IOperation op in Operators)
             {
-                while (calc.TryOperator(op.Pattern, out double[] values, out string expression))
+                while (calculation.TryOperator(op.Pattern, out double[] values, out string expression))
                 {
                     double result = op.Operate(values, expression);
-                    calc.ReplaceOperation(op.Pattern, result);
-                    Debug.WriteLine($"pattern: {op.Pattern}  result: {result}  calc: {calc}");
+                    calculation.ReplaceOperation(op.Pattern, result);
+                    Debug.WriteLine($"pattern: {op.Pattern}  result: {result}  calc: {calculation}  text: {calculation.Text}  numbers: {string.Join(", ", calculation.Numbers)}");
                 }
             }
-            return calc.ToString();
+            return calculation.ToString();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace calculator
 {
@@ -32,6 +33,34 @@ namespace calculator
             }
         }
 
+        /*public static string ConvertToSimpleNumbersCalculation(string calculation, out List<double> oldValues)
+        {
+            //calculation = Regex.Replace(calculation, @"(?<=(\d|\)))-(?=\d)", "+-");
+            const string numRegex = @"-?\d+([\.,]\d+)?";
+            List<Match> matches = Regex.Matches(calculation, numRegex).ToList();
+            oldValues = new List<double>(matches.Count);
+            string repacePattern = @"^(.*)";
+            foreach (Match match in matches)
+            {
+                oldValues.Add(double.Parse(match.Value));
+                repacePattern += match.Value + "(.*)";
+                //text = Helper.ReplaceRegexOnce(text, numRegex, (Numbers.Count - 1).ToString());
+            }
+            repacePattern += "$";
+            Match textMatch = Regex.Match(text, repacePattern);
+            this.Text = textMatch.Groups[1].Value;
+            for (int i = 2; i < textMatch.Groups.Count; i++)
+            {
+                this.Text += i - 2 + textMatch.Groups[i].Value;
+            }
+        }*/
+
+        public Calculation(string calculation, List<double> numbers)
+        {
+            Text = calculation;
+            Numbers = numbers;
+        }
+
         public bool TryOperator(string operatorPattern, out double[] values, out string expression)
         {
             Match match = MatchOperatorPattern(operatorPattern);
@@ -60,12 +89,22 @@ namespace calculator
                 throw new ArgumentException("failed match argument");
             }
             List<int> indexes = new List<int>();
-            for (int i = 1; i <= operatorMatch.Groups.Count - 1; i++)
+            if (operatorMatch.Groups.ContainsKey("Numbers"))
             {
-                Group group = operatorMatch.Groups[i];
-                if (group.Success)
+                foreach (Capture cap in operatorMatch.Groups["Numbers"].Captures)
                 {
-                    indexes.Add(int.Parse(operatorMatch.Groups[i].Value));
+                    indexes.Add(int.Parse(cap.Value));
+                }
+            }
+            else
+            {
+                for (int i = 1; i <= operatorMatch.Groups.Count - 1; i++)
+                {
+                    Group group = operatorMatch.Groups[i];
+                    if (group.Success)
+                    {
+                        indexes.Add(int.Parse(operatorMatch.Groups[i].Value));
+                    }
                 }
             }
             return indexes.ToArray();
@@ -99,7 +138,7 @@ namespace calculator
                 Numbers.Add(result);
             }
             string replacement = firstIndex.ToString();
-            if(Regex.IsMatch(Text, @"\d *" + match.Value))
+            if(Regex.IsMatch(Text, @"\d *" + match.Value))//num detection
             {
                 replacement = "+" + replacement;
             }
@@ -107,6 +146,7 @@ namespace calculator
             {
                 replacement += "+";
             }
+            //if(Regex.IsMatch(Text, ))
             Text = Helper.ReplaceOnce(Text, match.Value, replacement);
         }
 
@@ -115,7 +155,7 @@ namespace calculator
             string output = Text;
             for(int i = Numbers.Count - 1; i >= 0; i--)
             {
-                output = output.Replace(i.ToString(), Numbers[i].ToString());
+                output = Helper.ReplaceOnce(output, i.ToString(), Numbers[i].ToString());
             }
             return output;
         }
