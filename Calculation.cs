@@ -16,7 +16,7 @@ namespace calculator
         public Calculation(string text)
         {
             text = Regex.Replace(text, @"(?<=(\d|\))) *- *(?=\d)", "+-");
-            text = Regex.Replace(text, @"(?<=\d) *\{", "*{");
+            text = Regex.Replace(text, @"(?<=\d) *\(", "*(");
             const string numRegex = @"-?\d+([\.,]\d+)?";
             List<Match> matches = Regex.Matches(text, numRegex).ToList();
             Numbers = new List<double>(matches.Count);
@@ -150,7 +150,7 @@ namespace calculator
             {
                 replacement += "+";
             }
-            if(Regex.IsMatch(Text, Regex.Escape(match.Value) + @" *\{"))
+            if(Regex.IsMatch(Text, Regex.Escape(match.Value) + @" *\("))
             {
                 replacement += "*";
             }

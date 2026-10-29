@@ -7,7 +7,7 @@ namespace calculator.Operators
 {
     internal class Brackets : IOperation
     {
-        public string Pattern => @"(?<open>\{)(?(open)(?<Numbers>\d)*[^\{}]?(?<open>\{)*(?<close-open>})*)+(?(open)(?!))";
+        public string Pattern => @"(?<open>\()(?(open)(?<Numbers>\d)*[^\(\)]?(?<open>\()*(?<close-open>\))*)+(?(open)(?!))";
 
         public double Operate(double[] values, string expression)
         {
