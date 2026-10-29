@@ -15,9 +15,10 @@ namespace calculator
 
         public Calculation(string text)
         {
+            text = text.ToLower();
             text = Regex.Replace(text, @"(?<=(\d|\))) *- *(?=\d)", "+-");
             text = Regex.Replace(text, @"(?<=\d) *\(", "*(");
-            const string numRegex = @"-?\d+([\.,]\d+)?";
+            const string numRegex = @"-?\d+([\.]\d+)?";
             List<Match> matches = Regex.Matches(text, numRegex).ToList();
             Numbers = new List<double>(matches.Count);
             string repacePattern = @"^(.*)";

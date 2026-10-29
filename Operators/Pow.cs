@@ -7,7 +7,7 @@ namespace calculator.Operators
 {
     internal class Pow : SingleOperation
     {
-        public override string Pattern => @"\d \^ \d";
+        public override string Pattern => @"\d \*\* \d";
 
         public override double Operate(double[] values)
         {

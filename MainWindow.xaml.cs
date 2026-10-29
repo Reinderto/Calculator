@@ -26,8 +26,9 @@ namespace calculator
         private static void SetupCalculator()
         {
             //MultipleOperation minus = new MultipleOperation(new Minus(), new CompactMinus());
-            Calculator.Operators.Add(new Brackets());
             Calculator.Operators.Add(new ValueStack());
+            Calculator.Operators.AddRange(new Max(), new Minimum());
+            Calculator.Operators.Add(new Brackets());
             Calculator.Operators.Add(new Pow());
             Calculator.Operators.Add(new MultipleOperation(new Multipy(), new Divide(), new Modulo()));
             Calculator.Operators.Add(new MultipleOperation(new Minus(), new Add()));
