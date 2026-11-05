@@ -11,6 +11,21 @@ namespace calculator
     {
         public static List<IOperation> Operators = new List<IOperation>();
 
+        public static string Calculate(string calculation, ValueFormater resultFormatter)
+        {
+            return Calculator.Calculate(new Calculation(calculation), resultFormatter);
+        }
+
+        public static string Calculate(Calculation calculation, ValueFormater resultFormatter)
+        {
+            string result = Calculate(calculation);
+            if (double.TryParse(result.Trim(), out double res))
+            {
+                return resultFormatter.FormatTo(res);
+            }
+            return result;
+        }
+
         public static string Calculate(string calculation)
         {
             return Calculate(new Calculation(calculation));

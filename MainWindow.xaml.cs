@@ -17,16 +17,31 @@ namespace calculator
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static Dictionary<string, ValueFormater> ValueFormaters = new Dictionary<string, ValueFormater>()
+        {
+            ["default"] = new ValueFormater(),
+            ["minecraft"] = new ValueFormater(("chest", 27), ("stack", 64)),
+            ["wynn"] = new ValueFormater(("stx", 64), ("le", 64), ("eb", 64)),
+        };
         public MainWindow()
         {
             InitializeComponent();
             SetupCalculator();
+            SetupResultFormatterBox();
+        }
+
+        private void SetupResultFormatterBox()
+        {
+            ResultFormatterBox.ItemsSource = ValueFormaters.Keys;
         }
 
         private static void SetupCalculator()
         {
             //MultipleOperation minus = new MultipleOperation(new Minus(), new CompactMinus());
-            Calculator.Operators.Add(new ValueStack());
+            //Calculator.Operators.Add(new ValueStack());
+            Calculator.Operators.AddRange(ValueFormaters.Values.AsEnumerable().Skip(1));
+            //Calculator.Operators.Add(new ValueFormater(("stx", 64), ("le", 64), ("eb", 64)));
+            //Calculator.Operators.Add(new ValueFormater(("fullChest", 27), ("stack", 64)));
             Calculator.Operators.AddRange(new Max(), new Minimum());
             Calculator.Operators.Add(new Brackets());
             Calculator.Operators.Add(new Pow());
@@ -40,9 +55,19 @@ namespace calculator
 
         private void calculation_TextChanged(object sender, TextChangedEventArgs e)
         {
-            result.Text = Calculator.Calculate(calculation.Text).ToString();
+            UpdateCalculation();
 
             //result.Text += "\n" + Helper.BracketMatch(calculation.Text);
+        }
+
+        private void UpdateCalculation()
+        {
+            result.Text = Calculator.Calculate(calculation.Text, ValueFormaters[ResultFormatterBox.SelectedItem.ToString()]);
+        }
+
+        private void OnResultFormatterChanged(object sender, SelectionChangedEventArgs e)
+        {
+            UpdateCalculation();
         }
     }
 }
